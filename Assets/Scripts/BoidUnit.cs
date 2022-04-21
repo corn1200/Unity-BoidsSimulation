@@ -4,15 +4,68 @@ using UnityEngine;
 
 public class BoidUnit : MonoBehaviour
 {
-    // Start is called before the first frame update
+    Vector3 targetVec;
+    [SerializeField] float speed;
+    Boids myBoids;
+
+    List<BoidUnit> neighbours = new List<BoidUnit>();
+    [SerializeField] LayerMask boidUnitLayer;
+
+    public void InitializeUnit(Boids _boids, float _speed)
+    {
+        myBoids = _boids;
+        speed = _speed;
+    }
     void Start()
     {
-        
+
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        FindNeighbour();
+
+        Vector3 cohesionVec = CalculateCohesionVector();
+
+        targetVec = cohesionVec;
+
+        targetVec = Vector3.Lerp(this.transform.forward, targetVec, Time.deltaTime);
+        this.transform.rotation = Quaternion.LookRotation(targetVec);
+        this.transform.position += targetVec * speed * Time.deltaTime;
+    }
+
+    private void FindNeighbour()
+    {
+        neighbours.Clear();
+
+        Collider[] colls = Physics.OverlapSphere(transform.position, 20f, boidUnitLayer);
+        for (int i = 0; i < colls.Length; i++)
+        {
+            neighbours.Add(colls[i].GetComponent<BoidUnit>());
+        }
+    }
+
+    public Vector3 CalculateCohesionVector()
+    {
+        Vector3 cohesionVec = Vector3.zero;
+        if (neighbours.Count > 0)
+        {
+            //이웃 unit들의 위치 더하기
+            for (int i = 0; i < neighbours.Count; i++)
+            {
+                cohesionVec += neighbours[i].transform.position;
+            }
+        }
+        else
+        {
+            //이웃이 없으면 vector3.zero 반환
+            return cohesionVec;
+        }
+
+        //중심 위치로의 벡터 찾기
+        cohesionVec /= neighbours.Count;
+        cohesionVec -= transform.position;
+        cohesionVec.Normalize();
+        return cohesionVec;
     }
 }

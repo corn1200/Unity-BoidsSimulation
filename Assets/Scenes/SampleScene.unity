@@ -503,9 +503,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fb85bea0b4c1f5419a15c8c75ba478d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boidUnitPrefab: {fileID: 2587455276320277331, guid: df3a752889c3c0747ac69fbe7e9a5535, type: 3}
+  boidUnitPrefab: {fileID: 5844428713929901584, guid: 485cb8032317e244f9be1e43a60aee70, type: 3}
   boidCount: 500
-  spawnRange: 30
+  spawnRange: 50
 --- !u!1 &1357679834
 GameObject:
   m_ObjectHideFlags: 0

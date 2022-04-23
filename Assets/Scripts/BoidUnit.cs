@@ -26,6 +26,7 @@ public class BoidUnit : MonoBehaviour
         FindNeighbour();
 
         Vector3 cohesionVec = CalculateCohesionVector();
+        Vector3 alignmentVec = CalculateAlignmentVector();
 
         targetVec = cohesionVec;
 
@@ -65,7 +66,27 @@ public class BoidUnit : MonoBehaviour
         //중심 위치로의 벡터 찾기
         cohesionVec /= neighbours.Count;
         cohesionVec -= transform.position;
-        cohesionVec.Normalize();
         return cohesionVec;
+    }
+
+    public Vector3 CalculateAlignmentVector()
+    {
+        Vector3 alignmentVec = Vector3.zero;
+        if(neighbours.Count > 0)
+        {
+            //이웃들이 향하는 방향의 평균 방향으로 이동
+            for(int i = 0; i < neighbours.Count; i++)
+            {
+                alignmentVec += neighbours[i].transform.forward;
+            }
+        }
+        else
+        {
+            //이웃이 없으면 그냥 앞
+            return alignmentVec;
+        }
+
+        alignmentVec /= neighbours.Count;
+        return alignmentVec;
     }
 }

@@ -27,8 +27,9 @@ public class BoidUnit : MonoBehaviour
 
         Vector3 cohesionVec = CalculateCohesionVector();
         Vector3 alignmentVec = CalculateAlignmentVector();
+        Vector3 separationVec = CalculateSeparationVector();
 
-        targetVec = cohesionVec;
+        targetVec = cohesionVec + alignmentVec + separationVec;
 
         targetVec = Vector3.Lerp(this.transform.forward, targetVec, Time.deltaTime);
         this.transform.rotation = Quaternion.LookRotation(targetVec);
@@ -82,11 +83,31 @@ public class BoidUnit : MonoBehaviour
         }
         else
         {
-            //이웃이 없으면 그냥 앞
+            //이웃이 없으면 그냥 forawrd로 이동
             return alignmentVec;
         }
 
         alignmentVec /= neighbours.Count;
         return alignmentVec;
+    }
+
+    public Vector3 CalculateSeparationVector()
+    {
+        Vector3 separationVec = Vector3.zero;
+        if(neighbours.Count > 0)
+        {
+            for( int i = 0; i < neighbours.Count; i++)
+            {
+                //이웃들을 피하는 방향으로 이동
+                separationVec += (transform.position - neighbours[i].transform.position);
+            }
+        }
+        else
+        {
+            // 이웃이 없으면 그냥 forward로 이동
+            return separationVec;
+        }
+        separationVec /= neighbours.Count;
+        return separationVec;
     }
 }

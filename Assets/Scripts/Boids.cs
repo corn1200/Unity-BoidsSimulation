@@ -17,8 +17,8 @@ public class Boids : MonoBehaviour
             Vector3 randomVec = Random.insideUnitSphere;
             randomVec *= spawnRange;
 
-            Quaternion randomRot = Quaternion.Euler(0, Random.Range(30, 360f), 0);
-            BoidUnit currUnit = Instantiate(boidUnitPrefab, randomVec, randomRot);
+            Quaternion randomRot = Quaternion.Euler(0, Random.Range(0, 360f), 0);
+            BoidUnit currUnit = Instantiate(boidUnitPrefab, this.transform.position + randomVec, randomRot);
             currUnit.transform.SetParent(this.transform);
         }
     }

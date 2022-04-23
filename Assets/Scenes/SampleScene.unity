@@ -506,6 +506,10 @@ MonoBehaviour:
   boidUnitPrefab: {fileID: 5844428713929901584, guid: 485cb8032317e244f9be1e43a60aee70, type: 3}
   boidCount: 500
   spawnRange: 50
+  speedRange: {x: 10, y: 20}
+  cohesionWeight: 1
+  alignmentWeight: 1
+  separationWeight: 0.9
 --- !u!1 &1357679834
 GameObject:
   m_ObjectHideFlags: 0

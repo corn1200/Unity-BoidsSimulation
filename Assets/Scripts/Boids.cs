@@ -7,7 +7,7 @@ public class Boids : MonoBehaviour
     [SerializeField] private BoidUnit boidUnitPrefab;
     public int boidCount;
     public float spawnRange = 30;
-    [SerializeField] private Vector2 speedRange;
+    public Vector2 speedRange;
     //Cohesion - 주변 무리의 중심 방향으로 이동
     //Alignment - 주변 무리가 향하는 평균 방향으로 전환
     //Separation - 뭉쳐있는 무리를 피해 이동

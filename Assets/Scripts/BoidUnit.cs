@@ -45,16 +45,12 @@ public class BoidUnit : MonoBehaviour
         {
             myColor = myMeshRenderer.material.color;
         }
-    }
-    void Start()
-    {
 
+        findNeighbourCoroutine = StartCoroutine("FindNeighbourCoroutine");
+        calculateEgoVecotrCoroutine = StartCoroutine("CalculateEgoVectorCoroutine");
     }
-
     void Update()
     {
-        FindNeighbour();
-
         Vector3 cohesionVec = CalculateCohesionVector() * myBoids.cohesionWeight;
         Vector3 alignmentVec = CalculateAlignmentVector() * myBoids.alignmentWeight;
         Vector3 separationVec = CalculateSeparationVector() * myBoids.separationWeight;
@@ -68,11 +64,19 @@ public class BoidUnit : MonoBehaviour
         this.transform.position += targetVec * speed * Time.deltaTime;
     }
 
-    private void FindNeighbour()
+    IEnumerator CalculateEgoVectorCoroutine()
+    {
+        speed = Random.Range(myBoids.speedRange.x, myBoids.speedRange.y);
+        egoVector = Random.insideUnitSphere;
+        yield return new WaitForSeconds(Random.Range(1, 3f));
+        calculateEgoVecotrCoroutine = StartCoroutine("CalculateEgoVectorCoroutine");
+    }
+
+    IEnumerator FindNeighbourCoroutine()
     {
         neighbours.Clear();
 
-        Collider[] colls = Physics.OverlapSphere(transform.position, 20f, boidUnitLayer);
+        Collider[] colls = Physics.OverlapSphere(transform.position, neighbourDistance, boidUnitLayer);
         for (int i = 0; i < colls.Length; i++)
         {
             if (Vector3.Angle(transform.forward, colls[i].transform.position - transform.position) <= FOVAngle)
@@ -84,8 +88,9 @@ public class BoidUnit : MonoBehaviour
                 break;
             }
         }
+        yield return new WaitForSeconds(Random.Range(0.5f, 2f));
+        findNeighbourCoroutine = StartCoroutine("FindNeighbourCoroutine");
     }
-
     private Vector3 CalculateCohesionVector()
     {
         Vector3 cohesionVec = Vector3.zero;

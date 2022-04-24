@@ -8,15 +8,19 @@ public class Boids : MonoBehaviour
     public int boidCount;
     public float spawnRange = 30;
     public Vector2 speedRange;
+
     //Cohesion - 주변 무리의 중심 방향으로 이동
     //Alignment - 주변 무리가 향하는 평균 방향으로 전환
     //Separation - 뭉쳐있는 무리를 피해 이동
     public float cohesionWeight = 1;
     public float alignmentWeight = 1;
     public float separationWeight = 1;
+
     public float boundsWeight = 1;
+    public float egoWeight = 1;
 
     public bool randomColor = false;
+    public bool protectiveColor = false;
     public Color[] GizmoColors;
 
     void Start()

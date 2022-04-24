@@ -51,17 +51,46 @@ public class BoidUnit : MonoBehaviour
     }
     void Update()
     {
+        if (additionalSpeed > 0)
+        {
+            additionalSpeed -= Time.deltaTime;
+        }
+
+        //Boids의 기본 규칙
         Vector3 cohesionVec = CalculateCohesionVector() * myBoids.cohesionWeight;
         Vector3 alignmentVec = CalculateAlignmentVector() * myBoids.alignmentWeight;
         Vector3 separationVec = CalculateSeparationVector() * myBoids.separationWeight;
         //추가적인 규칙
         Vector3 boundsVec = CalculateBoundsVector() * myBoids.boundsWeight;
+        Vector3 egoVec = egoVector * myBoids.egoWeight;
 
-        targetVec = cohesionVec + alignmentVec + separationVec + boundsVec;
+        targetVec = cohesionVec + alignmentVec + separationVec + boundsVec + egoVec;
 
         targetVec = Vector3.Lerp(this.transform.forward, targetVec, Time.deltaTime);
+        targetVec = targetVec.normalized;
+        if (targetVec == Vector3.zero)
+        {
+            targetVec = egoVector;
+        }
+
         this.transform.rotation = Quaternion.LookRotation(targetVec);
-        this.transform.position += targetVec * speed * Time.deltaTime;
+        this.transform.position += targetVec * (speed + additionalSpeed) * Time.deltaTime;
+
+        //Color Lerp
+        if (myBoids.protectiveColor && neighbours.Count > 0)
+        {
+            Vector3 colorSum = new Vector3(myColor.r, myColor.g, myColor.b);
+            for (int i = 0; i < neighbours.Count; i++)
+            {
+                Color tmpColor = neighbours[i].myColor;
+                colorSum += new Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
+            }
+            myMeshRenderer.material.color = Color.Lerp(myMeshRenderer.material.color, new Color(colorSum.x / neighbours.Count, colorSum.y / neighbours.Count, colorSum.z / neighbours.Count, 1f), Time.deltaTime);
+        }
+        else
+        {
+            myMeshRenderer.material.color = Color.Lerp(myMeshRenderer.material.color, myColor, Time.deltaTime);
+        }
     }
 
     IEnumerator CalculateEgoVectorCoroutine()

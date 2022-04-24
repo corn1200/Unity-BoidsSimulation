@@ -8,18 +8,43 @@ public class BoidUnit : MonoBehaviour
     List<BoidUnit> neighbours = new List<BoidUnit>();
 
     Vector3 targetVec;
+    Vector3 egoVector;
     float speed;
+
+    float additionalSpeed = 0;
+
+    MeshRenderer myMeshRenderer;
+    TrailRenderer myTrailRenderer;
+    [SerializeField] private Color myColor;
 
     [SerializeField] float obstacleDistance;
     [SerializeField] float FOVAngle = 120;
     [SerializeField] float maxNeighbourCount = 50;
+    [SerializeField] float neighbourDistance = 10;
 
     [SerializeField] LayerMask boidUnitLayer;
+    [SerializeField] LayerMask obstacleLayer;
 
+    Coroutine findNeighbourCoroutine;
+    Coroutine calculateEgoVecotrCoroutine;
     public void InitializeUnit(Boids _boids, float _speed)
     {
         myBoids = _boids;
         speed = _speed;
+
+        myTrailRenderer = GetComponentInChildren<TrailRenderer>();
+        myMeshRenderer = GetComponentInChildren<MeshRenderer>();
+
+        //색상 설정
+        if (myBoids.randomColor)
+        {
+            myColor = new Color(Random.value, Random.value, Random.value);
+            myMeshRenderer.material.color = myColor;
+        }
+        else
+        {
+            myColor = myMeshRenderer.material.color;
+        }
     }
     void Start()
     {
@@ -54,7 +79,7 @@ public class BoidUnit : MonoBehaviour
             {
                 neighbours.Add(colls[i].GetComponent<BoidUnit>());
             }
-            if(i > maxNeighbourCount)
+            if (i > maxNeighbourCount)
             {
                 break;
             }
@@ -129,5 +154,18 @@ public class BoidUnit : MonoBehaviour
     {
         Vector3 offsetToCenter = myBoids.transform.position - transform.position;
         return offsetToCenter.magnitude >= myBoids.spawnRange ? offsetToCenter.normalized : Vector3.zero;
+    }
+
+    public void DrawVectorGizmo(int _depth)
+    {
+        for (int i = 0; i < neighbours.Count; i++)
+        {
+            if (_depth + 1 < myBoids.GizmoColors.Length - 1)
+            {
+                neighbours[i].DrawVectorGizmo(_depth + 1);
+            }
+            Debug.DrawLine(this.transform.position, neighbours[i].transform.position, myBoids.GizmoColors[_depth + 1]);
+            Debug.DrawLine(this.transform.position, this.transform.position + targetVec, myBoids.GizmoColors[0]);
+        }
     }
 }

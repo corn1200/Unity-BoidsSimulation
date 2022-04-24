@@ -16,6 +16,9 @@ public class Boids : MonoBehaviour
     public float separationWeight = 1;
     public float boundsWeight = 1;
 
+    public bool randomColor = false;
+    public Color[] GizmoColors;
+
     void Start()
     {
         for (int i = 0; i < boidCount; i++)

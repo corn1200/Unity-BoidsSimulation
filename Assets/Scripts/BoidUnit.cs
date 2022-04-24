@@ -26,7 +26,7 @@ public class BoidUnit : MonoBehaviour
     [SerializeField] LayerMask obstacleLayer;
 
     Coroutine findNeighbourCoroutine;
-    Coroutine calculateEgoVecotrCoroutine;
+    Coroutine calculateEgoVectorCoroutine;
     public void InitializeUnit(Boids _boids, float _speed)
     {
         myBoids = _boids;
@@ -47,7 +47,7 @@ public class BoidUnit : MonoBehaviour
         }
 
         findNeighbourCoroutine = StartCoroutine("FindNeighbourCoroutine");
-        calculateEgoVecotrCoroutine = StartCoroutine("CalculateEgoVectorCoroutine");
+        calculateEgoVectorCoroutine = StartCoroutine("CalculateEgoVectorCoroutine");
     }
     void Update()
     {
@@ -62,6 +62,7 @@ public class BoidUnit : MonoBehaviour
         Vector3 separationVec = CalculateSeparationVector() * myBoids.separationWeight;
         //추가적인 규칙
         Vector3 boundsVec = CalculateBoundsVector() * myBoids.boundsWeight;
+        Vector3 obstacleVec = CaculateObstacleVector() * myBoids.obstacleWeight;
         Vector3 egoVec = egoVector * myBoids.egoWeight;
 
         targetVec = cohesionVec + alignmentVec + separationVec + boundsVec + egoVec;
@@ -77,7 +78,11 @@ public class BoidUnit : MonoBehaviour
         this.transform.position += targetVec * (speed + additionalSpeed) * Time.deltaTime;
 
         //Color Lerp
-        if (myBoids.protectiveColor && neighbours.Count > 0)
+        if (!myBoids.randomColor)
+        {
+            myMeshRenderer.material.color = Color.white;
+        }
+        else if (myBoids.protectiveColor && neighbours.Count > 0)
         {
             Vector3 colorSum = new Vector3(myColor.r, myColor.g, myColor.b);
             for (int i = 0; i < neighbours.Count; i++)
@@ -98,7 +103,7 @@ public class BoidUnit : MonoBehaviour
         speed = Random.Range(myBoids.speedRange.x, myBoids.speedRange.y);
         egoVector = Random.insideUnitSphere;
         yield return new WaitForSeconds(Random.Range(1, 3f));
-        calculateEgoVecotrCoroutine = StartCoroutine("CalculateEgoVectorCoroutine");
+        calculateEgoVectorCoroutine = StartCoroutine("CalculateEgoVectorCoroutine");
     }
 
     IEnumerator FindNeighbourCoroutine()
@@ -140,6 +145,7 @@ public class BoidUnit : MonoBehaviour
         //중심 위치로의 벡터 찾기
         cohesionVec /= neighbours.Count;
         cohesionVec -= transform.position;
+        cohesionVec.Normalize();
         return cohesionVec;
     }
 
@@ -161,6 +167,7 @@ public class BoidUnit : MonoBehaviour
         }
 
         alignmentVec /= neighbours.Count;
+        alignmentVec.Normalize();
         return alignmentVec;
     }
 
@@ -181,6 +188,7 @@ public class BoidUnit : MonoBehaviour
             return separationVec;
         }
         separationVec /= neighbours.Count;
+        separationVec.Normalize();
         return separationVec;
     }
 
@@ -188,6 +196,19 @@ public class BoidUnit : MonoBehaviour
     {
         Vector3 offsetToCenter = myBoids.transform.position - transform.position;
         return offsetToCenter.magnitude >= myBoids.spawnRange ? offsetToCenter.normalized : Vector3.zero;
+    }
+
+    private Vector3 CaculateObstacleVector()
+    {
+        Vector3 obstacleVec = Vector3.zero;
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, obstacleDistance, obstacleLayer))
+        {
+            Debug.DrawLine(transform.position, hit.point, Color.black);
+            obstacleVec = hit.normal;
+            additionalSpeed = 10;
+        }
+        return obstacleVec;
     }
 
     public void DrawVectorGizmo(int _depth)

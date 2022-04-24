@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
+using UnityEngine.UI;
 
 public class Boids : MonoBehaviour
 {
@@ -17,11 +19,24 @@ public class Boids : MonoBehaviour
     public float separationWeight = 1;
 
     public float boundsWeight = 1;
+    public float obstacleWeight = 10;
     public float egoWeight = 1;
 
+    public BoidUnit currUnit;
+    [SerializeField] LayerMask unitLayer;
+
+    [SerializeField] CinemachineVirtualCamera originCam;
+    [SerializeField] CinemachineFreeLook unitCam;
+
+    public bool cameraFollowUnit = false;
     public bool randomColor = false;
     public bool protectiveColor = false;
     public Color[] GizmoColors;
+
+    public Slider cohesionSlider;
+    public Slider alignmentSlider;
+    public Slider separationSlider;
+    public Toggle colorToggle;
 
     void Start()
     {
@@ -38,6 +53,45 @@ public class Boids : MonoBehaviour
 
     void Update()
     {
+        cohesionWeight = cohesionSlider.value;
+        alignmentWeight = alignmentSlider.value;
+        separationWeight = separationSlider.value;
+        colorToggle.onValueChanged.AddListener((value) =>
+        {
+            randomColor = value;
+        });
 
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Debug.DrawLine(ray.origin, ray.origin + ray.direction * 1000, Color.red, 3f);
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, unitLayer))
+            {
+                currUnit = hit.transform.GetComponent<BoidUnit>();
+            }
+            else
+            {
+                currUnit = null;
+            }
+        }
+
+        if (currUnit)
+        {
+            currUnit.DrawVectorGizmo(0);
+        }
+
+        if (cameraFollowUnit && currUnit != null)
+        {
+            originCam.gameObject.SetActive(false);
+            unitCam.gameObject.SetActive(true);
+            unitCam.Follow = currUnit.transform;
+            unitCam.LookAt = currUnit.transform;
+        }
+        else
+        {
+            originCam.gameObject.SetActive(true);
+            unitCam.gameObject.SetActive(false);
+        }
     }
 }

@@ -541,7 +541,7 @@ MonoBehaviour:
   speedRange: {x: 10, y: 20}
   cohesionWeight: 1.5
   alignmentWeight: 3
-  separationWeight: 2
+  separationWeight: 1.6
   boundsWeight: 10
 --- !u!1 &1418083040
 GameObject:
@@ -631,7 +631,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1649656592}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

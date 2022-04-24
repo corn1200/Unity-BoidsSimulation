@@ -12,6 +12,8 @@ public class BoidUnit : MonoBehaviour
 
     [SerializeField] float obstacleDistance;
     [SerializeField] float FOVAngle = 120;
+    [SerializeField] float maxNeighbourCount = 50;
+
     [SerializeField] LayerMask boidUnitLayer;
 
     public void InitializeUnit(Boids _boids, float _speed)
@@ -47,8 +49,15 @@ public class BoidUnit : MonoBehaviour
 
         Collider[] colls = Physics.OverlapSphere(transform.position, 20f, boidUnitLayer);
         for (int i = 0; i < colls.Length; i++)
-        {    
-            neighbours.Add(colls[i].GetComponent<BoidUnit>());
+        {
+            if (Vector3.Angle(transform.forward, colls[i].transform.position - transform.position) <= FOVAngle)
+            {
+                neighbours.Add(colls[i].GetComponent<BoidUnit>());
+            }
+            if(i > maxNeighbourCount)
+            {
+                break;
+            }
         }
     }
 
